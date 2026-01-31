@@ -3,7 +3,7 @@ import { GenerateWorkoutRequest, GenerateWorkoutResponse, Workout, Segment, gene
 import { calculateTSS, calculateIntensityFactor, calculateTotalDuration } from "@/lib/workout-utils";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
 const SYSTEM_PROMPT = `You are an expert cycling coach and workout designer for turbo trainers. Your job is to create structured cycling workouts based on user requests.
 

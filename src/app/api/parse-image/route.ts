@@ -3,7 +3,7 @@ import { Workout, Segment, generateId } from "@/types/workout";
 import { calculateTSS, calculateIntensityFactor, calculateTotalDuration } from "@/lib/workout-utils";
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
 const getImageSystemPrompt = (userFtp: number) => `You are an expert at analyzing cycling workout images and extracting structured workout data.
 
