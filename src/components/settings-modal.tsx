@@ -1,0 +1,98 @@
+"use client";
+
+import { useState } from "react";
+import { useFTP } from "@/hooks/use-ftp";
+import { X } from "lucide-react";
+
+interface SettingsModalProps {
+  onClose: () => void;
+}
+
+export function SettingsModal({ onClose }: SettingsModalProps) {
+  const [ftp, setFtp] = useFTP();
+  const [inputValue, setInputValue] = useState(ftp.toString());
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSave = () => {
+    const value = parseInt(inputValue);
+    if (isNaN(value) || value < 50 || value > 500) {
+      setError("Please enter a valid FTP between 50 and 500 watts");
+      return;
+    }
+    setFtp(value);
+    onClose();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSave();
+    } else if (e.key === "Escape") {
+      onClose();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div className="relative bg-card rounded-2xl shadow-xl w-full max-w-sm p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold">Settings</h2>
+          <button
+            onClick={onClose}
+            className="p-1.5 text-muted-foreground hover:text-foreground transition-colors rounded"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="space-y-4">
+          {/* FTP Setting */}
+          <div>
+            <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+              FTP (watts)
+            </label>
+            <input
+              type="number"
+              value={inputValue}
+              onChange={(e) => {
+                setInputValue(e.target.value);
+                setError(null);
+              }}
+              onKeyDown={handleKeyDown}
+              min={50}
+              max={500}
+              className="w-full px-4 py-3 bg-background rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 text-lg tabular-nums"
+            />
+            {error && (
+              <p className="text-sm text-destructive mt-2">{error}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex gap-3 mt-6">
+          <button
+            onClick={onClose}
+            className="flex-1 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            className="flex-1 py-2.5 text-sm bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-opacity font-medium"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

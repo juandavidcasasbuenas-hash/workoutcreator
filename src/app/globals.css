@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@theme {
+  /* Refined, airy palette */
+  --color-border: hsl(220 20% 92%);
+  --color-input: hsl(220 20% 96%);
+  --color-ring: hsl(220 70% 55%);
+  --color-background: hsl(220 30% 98.5%);
+  --color-foreground: hsl(220 25% 12%);
+
+  /* Primary - confident blue */
+  --color-primary: hsl(220 75% 52%);
+  --color-primary-foreground: hsl(0 0% 100%);
+
+  /* Secondary */
+  --color-secondary: hsl(220 20% 96%);
+  --color-secondary-foreground: hsl(220 25% 20%);
+
+  /* Destructive */
+  --color-destructive: hsl(0 70% 55%);
+  --color-destructive-foreground: hsl(0 0% 100%);
+
+  /* Muted */
+  --color-muted: hsl(220 20% 96%);
+  --color-muted-foreground: hsl(220 15% 50%);
+
+  /* Accent */
+  --color-accent: hsl(220 25% 95%);
+  --color-accent-foreground: hsl(220 25% 15%);
+
+  /* Popover */
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(220 25% 12%);
+
+  /* Card - pure white with subtle lift */
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(220 25% 12%);
+
+  /* Surface - very subtle tint */
+  --color-surface: hsl(220 30% 98%);
+  --color-surface-foreground: hsl(220 25% 12%);
+
+  --radius: 1rem;
+
+  /* Zone colors - refined, tasteful, vivid where it matters */
+  --zone-1: hsl(215 20% 60%);
+  --zone-2: hsl(172 55% 38%);
+  --zone-3: hsl(152 60% 36%);
+  --zone-4: hsl(38 90% 50%);
+  --zone-5: hsl(328 65% 52%);
+  --zone-6: hsl(265 60% 55%);
+  --zone-7: hsl(280 70% 42%);
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tabular figures for metrics - essential for data */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Power zone backgrounds */
+.zone-1 { background-color: var(--zone-1); }
+.zone-2 { background-color: var(--zone-2); }
+.zone-3 { background-color: var(--zone-3); }
+.zone-4 { background-color: var(--zone-4); }
+.zone-5 { background-color: var(--zone-5); }
+.zone-6 { background-color: var(--zone-6); }
+.zone-7 { background-color: var(--zone-7); }
+
+/* Zone text colors */
+.zone-text-1 { color: var(--zone-1); }
+.zone-text-2 { color: var(--zone-2); }
+.zone-text-3 { color: var(--zone-3); }
+.zone-text-4 { color: var(--zone-4); }
+.zone-text-5 { color: var(--zone-5); }
+.zone-text-6 { color: var(--zone-6); }
+.zone-text-7 { color: var(--zone-7); }
+
+/* Minimal scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(220 15% 85%);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(220 15% 75%);
+}
+
+/* Focus states - subtle but visible */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
