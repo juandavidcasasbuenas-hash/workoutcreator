@@ -228,9 +228,10 @@ function HomeWithCallback() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           <button
             onClick={handleBack}
-            className="text-base sm:text-lg font-semibold tracking-tight hover:text-muted-foreground transition-colors"
+            className="flex items-center gap-2 text-base sm:text-lg font-semibold tracking-tight hover:text-muted-foreground transition-colors"
           >
-            BrowserTurbo
+            <img src="/logo.svg" alt="BrowserTurbo" className="w-7 h-7 sm:w-8 sm:h-8" />
+            <span className="hidden sm:inline">BrowserTurbo</span>
           </button>
 
           {/* Step Indicator - minimal */}

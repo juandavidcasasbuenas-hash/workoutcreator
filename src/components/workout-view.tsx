@@ -27,6 +27,15 @@ interface WorkoutViewProps {
 
 export function WorkoutView({ workout, onBack, onSave, onUpdate, onStartWorkout }: WorkoutViewProps) {
   const [ftp] = useFTP();
+  const prevFtpRef = useRef(ftp);
+
+  useEffect(() => {
+    if (prevFtpRef.current !== ftp) {
+      prevFtpRef.current = ftp;
+      onUpdate(recalculateWorkoutStats(workout, ftp));
+    }
+  }, [ftp]);
+
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(workout.name);
   const [isSaved, setIsSaved] = useState(false);

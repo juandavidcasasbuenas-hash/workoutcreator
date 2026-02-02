@@ -10,6 +10,9 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "BrowserTurbo",
   description: "AI-Powered Workout Creator for turbo trainers",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
