@@ -124,36 +124,37 @@ export function CompletedWorkoutReview({
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-card/80 backdrop-blur-sm sticky top-0 z-40">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
             <button
               onClick={onBack}
-              className="p-2 hover:bg-accent rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+              className="p-2 hover:bg-accent rounded-lg transition-colors text-muted-foreground hover:text-foreground flex-shrink-0"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div>
-              <h1 className="text-lg font-semibold tracking-tight">
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-lg font-semibold tracking-tight truncate">
                 {workout.name}
               </h1>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                 Completed {formatCompletedDate(completion.completedAt)}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-green-500">
-              <CheckCircle className="w-5 h-5" />
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            <div className="flex items-center gap-1 sm:gap-2 text-green-500">
+              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="text-sm font-medium hidden sm:inline">Completed</span>
             </div>
             {onDoAgain && (
               <button
                 onClick={onDoAgain}
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity text-sm"
+                className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity text-xs sm:text-sm"
               >
-                <Play className="w-4 h-4" />
-                Do Again
+                <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Do Again</span>
+                <span className="sm:hidden">Redo</span>
               </button>
             )}
           </div>
@@ -161,115 +162,115 @@ export function CompletedWorkoutReview({
       </header>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-5 sm:py-8 space-y-5 sm:space-y-8">
         {/* Summary Stats */}
-        <div className="bg-card rounded-2xl p-6 shadow-sm">
+        <div className="bg-card rounded-2xl p-4 sm:p-6 shadow-sm">
           <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">
             Workout Summary
           </h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
             {/* Duration */}
-            <div className="bg-background rounded-xl p-4 text-center">
-              <Clock className="w-5 h-5 mx-auto mb-2 text-muted-foreground" />
-              <div className="text-2xl font-semibold tabular-nums">
+            <div className="bg-background rounded-xl p-3 sm:p-4 text-center">
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1.5 sm:mb-2 text-muted-foreground" />
+              <div className="text-lg sm:text-2xl font-semibold tabular-nums">
                 {summary ? formatDuration(summary.actualDuration) : '--'}
               </div>
-              <div className="text-xs text-muted-foreground mt-1">Duration</div>
-              <div className="text-xs text-muted-foreground/60">
+              <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Duration</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground/60">
                 Planned: {formatDuration(workout.totalDuration)}
               </div>
             </div>
 
             {/* Average Power */}
-            <div className="bg-background rounded-xl p-4 text-center">
-              <Zap className="w-5 h-5 mx-auto mb-2 text-yellow-500" />
-              <div className="text-2xl font-semibold tabular-nums">
+            <div className="bg-background rounded-xl p-3 sm:p-4 text-center">
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1.5 sm:mb-2 text-yellow-500" />
+              <div className="text-lg sm:text-2xl font-semibold tabular-nums">
                 {summary?.avgPower ?? '--'}
-                <span className="text-sm font-normal text-muted-foreground ml-1">W</span>
+                <span className="text-xs sm:text-sm font-normal text-muted-foreground ml-1">W</span>
               </div>
-              <div className="text-xs text-muted-foreground mt-1">Avg Power</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Avg Power</div>
               {summary?.maxPower && (
-                <div className="text-xs text-muted-foreground/60">
+                <div className="text-[10px] sm:text-xs text-muted-foreground/60">
                   Max: {summary.maxPower}W
                 </div>
               )}
             </div>
 
             {/* Normalized Power */}
-            <div className="bg-background rounded-xl p-4 text-center">
-              <TrendingUp className="w-5 h-5 mx-auto mb-2 text-blue-500" />
-              <div className="text-2xl font-semibold tabular-nums">
+            <div className="bg-background rounded-xl p-3 sm:p-4 text-center">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1.5 sm:mb-2 text-blue-500" />
+              <div className="text-lg sm:text-2xl font-semibold tabular-nums">
                 {summary?.normalizedPower ?? '--'}
-                <span className="text-sm font-normal text-muted-foreground ml-1">W</span>
+                <span className="text-xs sm:text-sm font-normal text-muted-foreground ml-1">W</span>
               </div>
-              <div className="text-xs text-muted-foreground mt-1">Normalized</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">Normalized</div>
               {summary?.normalizedPower && ftp > 0 && (
-                <div className="text-xs text-muted-foreground/60">
+                <div className="text-[10px] sm:text-xs text-muted-foreground/60">
                   IF: {(summary.normalizedPower / ftp).toFixed(2)}
                 </div>
               )}
             </div>
 
             {/* TSS */}
-            <div className="bg-background rounded-xl p-4 text-center">
-              <Activity className="w-5 h-5 mx-auto mb-2 text-green-500" />
-              <div className="text-2xl font-semibold tabular-nums text-green-600">
+            <div className="bg-background rounded-xl p-3 sm:p-4 text-center">
+              <Activity className="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1.5 sm:mb-2 text-green-500" />
+              <div className="text-lg sm:text-2xl font-semibold tabular-nums text-green-600">
                 {summary?.actualTSS ?? '--'}
               </div>
-              <div className="text-xs text-muted-foreground mt-1">TSS</div>
-              <div className="text-xs text-muted-foreground/60">
+              <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">TSS</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground/60">
                 Planned: {workout.estimatedTSS}
               </div>
             </div>
           </div>
 
           {/* Secondary stats row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mt-3 sm:mt-4">
             {/* Cadence */}
-            <div className="bg-background rounded-xl p-3 text-center">
-              <div className="text-lg font-semibold tabular-nums">
+            <div className="bg-background rounded-xl p-2.5 sm:p-3 text-center">
+              <div className="text-base sm:text-lg font-semibold tabular-nums">
                 {summary?.avgCadence ?? '--'}
-                <span className="text-sm font-normal text-muted-foreground ml-1">rpm</span>
+                <span className="text-xs sm:text-sm font-normal text-muted-foreground ml-1">rpm</span>
               </div>
-              <div className="text-xs text-muted-foreground">Avg Cadence</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground">Avg Cadence</div>
             </div>
 
             {/* Heart Rate */}
-            <div className="bg-background rounded-xl p-3 text-center">
-              <div className="text-lg font-semibold tabular-nums">
+            <div className="bg-background rounded-xl p-2.5 sm:p-3 text-center">
+              <div className="text-base sm:text-lg font-semibold tabular-nums">
                 {summary?.avgHeartRate ?? '--'}
-                <span className="text-sm font-normal text-muted-foreground ml-1">bpm</span>
+                <span className="text-xs sm:text-sm font-normal text-muted-foreground ml-1">bpm</span>
               </div>
-              <div className="text-xs text-muted-foreground">Avg HR</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground">Avg HR</div>
             </div>
 
             {/* Max HR */}
-            <div className="bg-background rounded-xl p-3 text-center">
-              <div className="text-lg font-semibold tabular-nums">
+            <div className="bg-background rounded-xl p-2.5 sm:p-3 text-center">
+              <div className="text-base sm:text-lg font-semibold tabular-nums">
                 {summary?.maxHeartRate ?? '--'}
-                <span className="text-sm font-normal text-muted-foreground ml-1">bpm</span>
+                <span className="text-xs sm:text-sm font-normal text-muted-foreground ml-1">bpm</span>
               </div>
-              <div className="text-xs text-muted-foreground">Max HR</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground">Max HR</div>
             </div>
 
             {/* FTP Reference */}
-            <div className="bg-background rounded-xl p-3 text-center">
-              <div className="text-lg font-semibold tabular-nums">
+            <div className="bg-background rounded-xl p-2.5 sm:p-3 text-center">
+              <div className="text-base sm:text-lg font-semibold tabular-nums">
                 {ftp}
-                <span className="text-sm font-normal text-muted-foreground ml-1">W</span>
+                <span className="text-xs sm:text-sm font-normal text-muted-foreground ml-1">W</span>
               </div>
-              <div className="text-xs text-muted-foreground">FTP</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground">FTP</div>
             </div>
           </div>
 
           {/* Peak Powers */}
           {summary?.peakPowers && summary.peakPowers.length > 0 && (
-            <div className="mt-6 pt-6 border-t border-border">
-              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
+            <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-border">
+              <div className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 sm:mb-3">
                 Peak Power
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-2">
                 {summary.peakPowers.map((peak) => {
                   const label = peak.duration < 60
                     ? `${peak.duration}s`
@@ -279,13 +280,13 @@ export function CompletedWorkoutReview({
                   return (
                     <div
                       key={peak.duration}
-                      className="bg-background rounded-lg px-3 py-2 text-center min-w-[70px]"
+                      className="bg-background rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-center sm:min-w-[70px]"
                     >
-                      <div className="text-lg font-semibold tabular-nums">
+                      <div className="text-base sm:text-lg font-semibold tabular-nums">
                         {peak.power}
-                        <span className="text-xs font-normal text-muted-foreground">W</span>
+                        <span className="text-[10px] sm:text-xs font-normal text-muted-foreground">W</span>
                       </div>
-                      <div className="text-[10px] text-muted-foreground">{label}</div>
+                      <div className="text-[9px] sm:text-[10px] text-muted-foreground">{label}</div>
                     </div>
                   );
                 })}
@@ -295,7 +296,7 @@ export function CompletedWorkoutReview({
         </div>
 
         {/* Power Graph */}
-        <div className="bg-card rounded-2xl p-6 shadow-sm">
+        <div className="bg-card rounded-2xl p-3 sm:p-6 shadow-sm">
           <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">
             Power Analysis
           </h2>
@@ -308,7 +309,7 @@ export function CompletedWorkoutReview({
         </div>
 
         {/* Export Actions */}
-        <div className="bg-card rounded-2xl p-6 shadow-sm">
+        <div className="bg-card rounded-2xl p-4 sm:p-6 shadow-sm">
           <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide mb-4">
             Export & Share
           </h2>

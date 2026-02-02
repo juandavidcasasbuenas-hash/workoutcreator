@@ -164,11 +164,11 @@ export function WorkoutView({ workout, onBack, onSave, onUpdate, onStartWorkout 
     )}>
       {/* Edit Mode Banner */}
       {showQuickEdit && (
-        <div className="bg-primary text-primary-foreground px-4 py-2 rounded-lg flex items-center justify-between animate-in slide-in-from-top-2 duration-300">
+        <div className="bg-primary text-primary-foreground px-3 sm:px-4 py-2 rounded-lg flex items-center justify-between animate-in slide-in-from-top-2 duration-300">
           <div className="flex items-center gap-2">
-            <Edit2 className="w-4 h-4" />
-            <span className="font-medium">Edit Mode Active</span>
-            <span className="text-primary-foreground/70 text-sm">— Click segments to modify them</span>
+            <Edit2 className="w-4 h-4 flex-shrink-0" />
+            <span className="font-medium text-sm sm:text-base">Edit Mode</span>
+            <span className="text-primary-foreground/70 text-sm hidden sm:inline">— Click segments to modify them</span>
           </div>
           <button
             onClick={() => setShowQuickEdit(false)}
@@ -180,41 +180,95 @@ export function WorkoutView({ workout, onBack, onSave, onUpdate, onStartWorkout 
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back</span>
-        </button>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="hidden sm:inline">Back</span>
+          </button>
 
-        <div className="flex items-center gap-3">
-          {onStartWorkout && (
+          {/* Desktop: all buttons in one row */}
+          <div className="hidden sm:flex items-center gap-3">
+            {onStartWorkout && (
+              <button
+                onClick={onStartWorkout}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors font-medium"
+              >
+                <Play className="w-4 h-4" />
+                <span>Start Workout</span>
+              </button>
+            )}
             <button
-              onClick={onStartWorkout}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors font-medium"
+              onClick={() => setShowQuickEdit(!showQuickEdit)}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 border",
+                showQuickEdit
+                  ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                  : "border-border hover:bg-accent"
+              )}
             >
-              <Play className="w-4 h-4" />
-              <span>Start Workout</span>
+              <Edit2 className={cn("w-4 h-4", showQuickEdit && "animate-pulse")} />
+              <span>{showQuickEdit ? "Editing" : "Edit workout"}</span>
             </button>
-          )}
+            <button
+              onClick={handleSave}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors",
+                isSaved
+                  ? "bg-green-500 text-white"
+                  : "bg-primary text-primary-foreground hover:bg-primary/90"
+              )}
+            >
+              {isSaved ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span>Saved!</span>
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  <span>Save</span>
+                </>
+              )}
+            </button>
+            <ExportMenu workout={workout} ftp={ftp} />
+          </div>
+
+          {/* Mobile: only Start button in header row */}
+          <div className="flex sm:hidden items-center gap-2">
+            {onStartWorkout && (
+              <button
+                onClick={onStartWorkout}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors font-medium text-sm"
+              >
+                <Play className="w-4 h-4" />
+                <span>Start</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile: secondary actions row */}
+        <div className="flex sm:hidden items-center gap-2">
           <button
             onClick={() => setShowQuickEdit(!showQuickEdit)}
             className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 border",
+              "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 border text-sm",
               showQuickEdit
                 ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/25"
                 : "border-border hover:bg-accent"
             )}
           >
             <Edit2 className={cn("w-4 h-4", showQuickEdit && "animate-pulse")} />
-            <span>{showQuickEdit ? "Editing" : "Edit workout"}</span>
+            <span>{showQuickEdit ? "Editing" : "Edit"}</span>
           </button>
           <button
             onClick={handleSave}
             className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors",
+              "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm",
               isSaved
                 ? "bg-green-500 text-white"
                 : "bg-primary text-primary-foreground hover:bg-primary/90"
@@ -238,35 +292,37 @@ export function WorkoutView({ workout, onBack, onSave, onUpdate, onStartWorkout 
 
       {/* Quick Edit Panel */}
       {showQuickEdit && (
-        <div className="bg-primary/5 rounded-lg border-2 border-primary/20 p-4 animate-in fade-in-0 duration-300">
-          <h3 className="font-medium mb-3 text-primary">Quick Adjustments</h3>
-          <div className="flex flex-wrap gap-4">
+        <div className="bg-primary/5 rounded-lg border-2 border-primary/20 p-3 sm:p-4 animate-in fade-in-0 duration-300">
+          <h3 className="font-medium mb-3 text-primary text-sm sm:text-base">Quick Adjustments</h3>
+          <div className="space-y-3 sm:space-y-0 sm:flex sm:flex-wrap sm:gap-4">
             {/* Duration scaling */}
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Duration:</span>
+            <div className="space-y-1.5 sm:space-y-0 sm:flex sm:items-center sm:gap-2">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Duration:</span>
+              </div>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => handleScaleWorkout(0.75)}
-                  className="px-2 py-1 text-xs border border-border rounded hover:bg-accent"
+                  className="flex-1 sm:flex-none px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs border border-border rounded hover:bg-accent"
                 >
                   -25%
                 </button>
                 <button
                   onClick={() => handleScaleWorkout(0.9)}
-                  className="px-2 py-1 text-xs border border-border rounded hover:bg-accent"
+                  className="flex-1 sm:flex-none px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs border border-border rounded hover:bg-accent"
                 >
                   -10%
                 </button>
                 <button
                   onClick={() => handleScaleWorkout(1.1)}
-                  className="px-2 py-1 text-xs border border-border rounded hover:bg-accent"
+                  className="flex-1 sm:flex-none px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs border border-border rounded hover:bg-accent"
                 >
                   +10%
                 </button>
                 <button
                   onClick={() => handleScaleWorkout(1.25)}
-                  className="px-2 py-1 text-xs border border-border rounded hover:bg-accent"
+                  className="flex-1 sm:flex-none px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs border border-border rounded hover:bg-accent"
                 >
                   +25%
                 </button>
@@ -274,31 +330,33 @@ export function WorkoutView({ workout, onBack, onSave, onUpdate, onStartWorkout 
             </div>
 
             {/* Power scaling */}
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Intensity:</span>
+            <div className="space-y-1.5 sm:space-y-0 sm:flex sm:items-center sm:gap-2">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Intensity:</span>
+              </div>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => handleScalePower(-10)}
-                  className="px-2 py-1 text-xs border border-border rounded hover:bg-accent"
+                  className="flex-1 sm:flex-none px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs border border-border rounded hover:bg-accent"
                 >
                   -10%
                 </button>
                 <button
                   onClick={() => handleScalePower(-5)}
-                  className="px-2 py-1 text-xs border border-border rounded hover:bg-accent"
+                  className="flex-1 sm:flex-none px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs border border-border rounded hover:bg-accent"
                 >
                   -5%
                 </button>
                 <button
                   onClick={() => handleScalePower(5)}
-                  className="px-2 py-1 text-xs border border-border rounded hover:bg-accent"
+                  className="flex-1 sm:flex-none px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs border border-border rounded hover:bg-accent"
                 >
                   +5%
                 </button>
                 <button
                   onClick={() => handleScalePower(10)}
-                  className="px-2 py-1 text-xs border border-border rounded hover:bg-accent"
+                  className="flex-1 sm:flex-none px-2.5 py-1.5 sm:px-2 sm:py-1 text-xs border border-border rounded hover:bg-accent"
                 >
                   +10%
                 </button>
@@ -309,7 +367,7 @@ export function WorkoutView({ workout, onBack, onSave, onUpdate, onStartWorkout 
       )}
 
       {/* Workout title */}
-      <div className="bg-card text-card-foreground rounded-xl p-5">
+      <div className="bg-card text-card-foreground rounded-xl p-4 sm:p-5">
         <div className="flex items-center gap-3 mb-2">
           {isEditingName ? (
             <div className="flex items-center gap-2 flex-1">
@@ -355,7 +413,7 @@ export function WorkoutView({ workout, onBack, onSave, onUpdate, onStartWorkout 
       </div>
 
       {/* Power Graph */}
-      <div className="bg-surface rounded-xl p-5 sticky top-2 z-10">
+      <div className="bg-surface rounded-xl p-3 sm:p-5 sticky top-2 z-10">
         <div className="mb-3">
           <span className="text-xs text-muted-foreground">Click on the graph to jump to a segment</span>
         </div>
@@ -368,22 +426,22 @@ export function WorkoutView({ workout, onBack, onSave, onUpdate, onStartWorkout 
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-card text-card-foreground rounded-xl p-4 text-center">
-          <div className="text-2xl font-bold tabular-nums">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="bg-card text-card-foreground rounded-xl p-3 sm:p-4 text-center">
+          <div className="text-lg sm:text-2xl font-bold tabular-nums">
             {formatDuration(workout.totalDuration)}
           </div>
-          <div className="text-xs uppercase tracking-wide opacity-60 mt-1">Duration</div>
+          <div className="text-[10px] sm:text-xs uppercase tracking-wide opacity-60 mt-1">Duration</div>
         </div>
-        <div className="bg-card text-card-foreground rounded-xl p-4 text-center">
-          <div className="text-2xl font-bold tabular-nums">{workout.estimatedTSS}</div>
-          <div className="text-xs uppercase tracking-wide opacity-60 mt-1">TSS</div>
+        <div className="bg-card text-card-foreground rounded-xl p-3 sm:p-4 text-center">
+          <div className="text-lg sm:text-2xl font-bold tabular-nums">{workout.estimatedTSS}</div>
+          <div className="text-[10px] sm:text-xs uppercase tracking-wide opacity-60 mt-1">TSS</div>
         </div>
-        <div className="bg-card text-card-foreground rounded-xl p-4 text-center">
-          <div className="text-2xl font-bold tabular-nums">
+        <div className="bg-card text-card-foreground rounded-xl p-3 sm:p-4 text-center">
+          <div className="text-lg sm:text-2xl font-bold tabular-nums">
             {workout.intensityFactor.toFixed(2)}
           </div>
-          <div className="text-xs uppercase tracking-wide opacity-60 mt-1">IF</div>
+          <div className="text-[10px] sm:text-xs uppercase tracking-wide opacity-60 mt-1">IF</div>
         </div>
       </div>
 
@@ -393,7 +451,7 @@ export function WorkoutView({ workout, onBack, onSave, onUpdate, onStartWorkout 
         showQuickEdit && "ring-2 ring-primary/40"
       )}>
         <div className={cn(
-          "px-5 py-3 border-b border-border flex items-center justify-between",
+          "px-4 sm:px-5 py-3 border-b border-border flex items-center justify-between",
           showQuickEdit && "bg-primary/10"
         )}>
           <h3 className="font-semibold text-sm">Segments</h3>
@@ -513,7 +571,7 @@ function SegmentRow({
     return (
       <div
         ref={rowRef}
-        className="p-4 bg-primary/10 border-l-4 border-primary animate-in fade-in-0 duration-200 relative"
+        className="p-3 sm:p-4 bg-primary/10 border-l-4 border-primary animate-in fade-in-0 duration-200 relative"
         onMouseEnter={() => onHover(true)}
         onMouseLeave={() => onHover(false)}
       >
@@ -522,7 +580,7 @@ function SegmentRow({
             Editing
           </span>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+        <div className="grid grid-cols-2 gap-3 mt-4">
           {/* Type */}
           <div>
             <label className="text-xs text-muted-foreground block mb-1">Type</label>
@@ -603,9 +661,9 @@ function SegmentRow({
     <div
       ref={rowRef}
       className={cn(
-        "flex items-center gap-4 p-4 transition-all duration-200",
+        "flex items-center gap-2 sm:gap-4 p-3 sm:p-4 transition-all duration-200",
         showEditControls
-          ? "hover:bg-primary/10 hover:border-l-4 hover:border-l-primary/50 cursor-pointer hover:pl-3"
+          ? "hover:bg-primary/10 hover:border-l-4 hover:border-l-primary/50 cursor-pointer hover:pl-2 sm:hover:pl-3"
           : "hover:bg-muted/50"
       )}
       onClick={showEditControls ? onEdit : undefined}
@@ -614,37 +672,37 @@ function SegmentRow({
     >
       {/* Color indicator */}
       <div
-        className="w-2 h-12 rounded-full flex-shrink-0"
+        className="w-1.5 sm:w-2 h-10 sm:h-12 rounded-full flex-shrink-0"
         style={{ backgroundColor: zoneColor }}
       />
 
       {/* Segment info */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <span className="font-medium">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <span className="font-medium text-sm sm:text-base">
             {getSegmentTypeName(segment.type)}
           </span>
           {segment.repeat && segment.repeat > 1 && (
-            <span className="text-xs bg-muted px-2 py-0.5 rounded">
+            <span className="text-[10px] sm:text-xs bg-muted px-1.5 sm:px-2 py-0.5 rounded">
               x{segment.repeat}
             </span>
           )}
         </div>
         {segment.instructions && (
-          <p className="text-sm text-muted-foreground truncate">
+          <p className="text-xs sm:text-sm text-muted-foreground truncate">
             {segment.instructions}
           </p>
         )}
       </div>
 
       {/* Power */}
-      <div className="text-right">
-        <div className="font-medium">
+      <div className="text-right flex-shrink-0">
+        <div className="font-medium text-sm sm:text-base">
           {segment.targetPower.valueHigh
             ? `${segment.targetPower.value}-${segment.targetPower.valueHigh}%`
             : `${Math.round(powerPercent)}%`}
         </div>
-        <div className="text-sm text-muted-foreground">
+        <div className="text-xs sm:text-sm text-muted-foreground">
           {segment.targetPower.valueHigh
             ? `${Math.round((segment.targetPower.value / 100) * ftp)}-${Math.round((segment.targetPower.valueHigh / 100) * ftp)}W`
             : `${powerWatts}W`}
@@ -652,29 +710,29 @@ function SegmentRow({
       </div>
 
       {/* Duration */}
-      <div className="text-right min-w-[60px]">
-        <div className="font-medium">
+      <div className="text-right min-w-[48px] sm:min-w-[60px] flex-shrink-0">
+        <div className="font-medium text-sm sm:text-base">
           {formatDuration(segment.duration)}
         </div>
       </div>
 
       {/* Edit controls */}
       {showEditControls && (
-        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
           <button
             onClick={onAddAfter}
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded"
+            className="p-1 sm:p-1.5 text-muted-foreground hover:text-foreground hover:bg-accent rounded"
             title="Add segment after"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
           {canDelete && (
             <button
               onClick={onDelete}
-              className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded"
+              className="p-1 sm:p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded"
               title="Delete segment"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           )}
         </div>

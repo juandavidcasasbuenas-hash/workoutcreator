@@ -225,16 +225,16 @@ function HomeWithCallback() {
   return (
     <main className="min-h-screen bg-background">
       <header className="bg-card/80 backdrop-blur-sm sticky top-0 z-40">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           <button
             onClick={handleBack}
-            className="text-lg font-semibold tracking-tight hover:text-muted-foreground transition-colors"
+            className="text-base sm:text-lg font-semibold tracking-tight hover:text-muted-foreground transition-colors"
           >
             BrowserTurbo
           </button>
 
           {/* Step Indicator - minimal */}
-          <div className="flex items-center gap-6 text-sm">
+          <div className="flex items-center gap-4 sm:gap-6 text-sm">
             <span className="font-medium text-foreground">Design</span>
             <span className="text-muted-foreground/40">Ride</span>
           </div>
@@ -248,7 +248,7 @@ function HomeWithCallback() {
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-6 py-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         {currentWorkout ? (
           <WorkoutView
             workout={currentWorkout}
@@ -258,7 +258,7 @@ function HomeWithCallback() {
             onStartWorkout={handleStartWorkout}
           />
         ) : (
-          <div className="space-y-12">
+          <div className="space-y-8 sm:space-y-12">
             <WorkoutCreator onWorkoutCreated={handleWorkoutCreated} />
             <RecentWorkouts
               workouts={savedWorkouts}

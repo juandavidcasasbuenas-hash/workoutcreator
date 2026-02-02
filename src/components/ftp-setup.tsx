@@ -62,7 +62,7 @@ export function FTPSetup({ onComplete }: FTPSetupProps) {
             </div>
 
             <div className="mb-6">
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {presets.map((preset) => (
                   <button
                     key={preset.label}

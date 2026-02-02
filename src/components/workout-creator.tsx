@@ -222,7 +222,7 @@ export function WorkoutCreator({ onWorkoutCreated }: WorkoutCreatorProps) {
                 ? "Type your answer..."
                 : "e.g. I have 20 minutes and want to wake up the legs before a race"
             }
-            className="w-full min-h-[120px] p-5 pr-14 bg-card rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm placeholder:text-muted-foreground/50"
+            className="w-full min-h-[100px] sm:min-h-[120px] p-4 sm:p-5 pr-14 bg-card rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm placeholder:text-muted-foreground/50 text-sm sm:text-base"
             disabled={isLoading}
           />
           {!followUpQuestion && !prompt && (
