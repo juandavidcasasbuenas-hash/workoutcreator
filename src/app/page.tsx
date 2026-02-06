@@ -277,7 +277,7 @@ function HomeWithCallback() {
             </p>
             <div className="flex items-center gap-2 shrink-0">
               <button
-                onClick={migration.migrateAll}
+                onClick={async () => { await migration.migrateAll(); window.location.reload(); }}
                 disabled={migration.isMigrating}
                 className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-40"
               >
