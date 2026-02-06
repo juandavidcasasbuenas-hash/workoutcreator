@@ -87,7 +87,7 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
             {!showDeleteConfirm ? (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+                className="text-xs text-destructive hover:opacity-70 transition-opacity"
               >
                 Delete account
               </button>
