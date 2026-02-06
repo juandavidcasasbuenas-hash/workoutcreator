@@ -81,51 +81,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
           </div>
         </div>
 
-        {/* Delete Account */}
-        {user && (
-          <div className="mt-6 pt-6 border-t border-border">
-            {!showDeleteConfirm ? (
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="text-xs text-destructive hover:opacity-70 transition-opacity"
-              >
-                Delete account
-              </button>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-xs text-destructive">
-                  This will permanently delete your account and all your workouts. This cannot be undone.
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setShowDeleteConfirm(false)}
-                    className="flex-1 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={async () => {
-                      setIsDeleting(true);
-                      const res = await fetch("/api/account/delete", { method: "POST" });
-                      if (res.ok) {
-                        window.location.href = "/";
-                      } else {
-                        setError("Failed to delete account. Please try again.");
-                        setIsDeleting(false);
-                        setShowDeleteConfirm(false);
-                      }
-                    }}
-                    disabled={isDeleting}
-                    className="flex-1 py-2 text-xs bg-destructive text-destructive-foreground rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-40"
-                  >
-                    {isDeleting ? "Deleting..." : "Yes, delete my account"}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Footer */}
         <div className="flex gap-3 mt-6">
           <button
@@ -141,6 +96,56 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
             Save
           </button>
         </div>
+
+        {/* Delete Account */}
+        {user && !showDeleteConfirm && (
+          <div className="mt-6 pt-4 border-t border-border text-center">
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="text-xs text-destructive hover:opacity-70 transition-opacity"
+            >
+              Delete account
+            </button>
+          </div>
+        )}
+
+        {/* Delete Confirmation — replaces entire modal content */}
+        {user && showDeleteConfirm && (
+          <div className="absolute inset-0 bg-card rounded-2xl p-6 flex flex-col items-center justify-center text-center">
+            <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+              <span className="text-destructive text-lg">!</span>
+            </div>
+            <h3 className="text-base font-semibold mb-2">Delete account?</h3>
+            <p className="text-xs text-muted-foreground mb-6 max-w-[240px]">
+              This will permanently delete your account and all your workouts. This cannot be undone.
+            </p>
+            <div className="flex gap-3 w-full">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  setIsDeleting(true);
+                  const res = await fetch("/api/account/delete", { method: "POST" });
+                  if (res.ok) {
+                    window.location.href = "/";
+                  } else {
+                    setError("Failed to delete account. Please try again.");
+                    setIsDeleting(false);
+                    setShowDeleteConfirm(false);
+                  }
+                }}
+                disabled={isDeleting}
+                className="flex-1 py-2.5 text-sm bg-destructive text-destructive-foreground rounded-xl font-medium hover:opacity-90 transition-opacity disabled:opacity-40"
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
