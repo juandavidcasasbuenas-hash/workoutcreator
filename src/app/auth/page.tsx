@@ -20,6 +20,12 @@ export default function AuthPage() {
             Continue without an account
           </Link>
         </p>
+        <p className="text-xs text-center text-muted-foreground mt-3">
+          By signing in you agree to our{" "}
+          <Link href="/privacy" className="underline underline-offset-2 hover:text-foreground transition-colors">
+            Privacy Policy
+          </Link>
+        </p>
       </div>
     </div>
   );
