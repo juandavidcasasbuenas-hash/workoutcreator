@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useFTP } from "@/hooks/use-ftp";
+import { useAuth } from "@/components/auth-provider";
 import { X } from "lucide-react";
 
 interface SettingsModalProps {
@@ -10,8 +11,11 @@ interface SettingsModalProps {
 
 export function SettingsModal({ onClose }: SettingsModalProps) {
   const [ftp, setFtp] = useFTP();
+  const { user } = useAuth();
   const [inputValue, setInputValue] = useState(ftp.toString());
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleSave = () => {
     const value = parseInt(inputValue);
@@ -76,6 +80,51 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
             )}
           </div>
         </div>
+
+        {/* Delete Account */}
+        {user && (
+          <div className="mt-6 pt-6 border-t border-border">
+            {!showDeleteConfirm ? (
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="text-xs text-muted-foreground hover:text-destructive transition-colors"
+              >
+                Delete account
+              </button>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-xs text-destructive">
+                  This will permanently delete your account and all your workouts. This cannot be undone.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="flex-1 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={async () => {
+                      setIsDeleting(true);
+                      const res = await fetch("/api/account/delete", { method: "POST" });
+                      if (res.ok) {
+                        window.location.href = "/";
+                      } else {
+                        setError("Failed to delete account. Please try again.");
+                        setIsDeleting(false);
+                        setShowDeleteConfirm(false);
+                      }
+                    }}
+                    disabled={isDeleting}
+                    className="flex-1 py-2 text-xs bg-destructive text-destructive-foreground rounded-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-40"
+                  >
+                    {isDeleting ? "Deleting..." : "Yes, delete my account"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Footer */}
         <div className="flex gap-3 mt-6">
