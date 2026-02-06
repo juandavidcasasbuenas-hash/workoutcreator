@@ -42,6 +42,8 @@ import {
   TrendingUp,
   Save,
   Trash2,
+  Minus,
+  Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +57,14 @@ export function WorkoutPlayer({ workout, onExit, onWorkoutComplete }: WorkoutPla
   const [ftp] = useFTP();
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showConnectivity, setShowConnectivity] = useState(false);
+  const connectivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (showConnectivity) {
+      connectivityTimerRef.current = setTimeout(() => setShowConnectivity(false), 4000);
+      return () => { if (connectivityTimerRef.current) clearTimeout(connectivityTimerRef.current); };
+    }
+  }, [showConnectivity]);
   const [showStravaModal, setShowStravaModal] = useState(false);
   const [pendingUploadData, setPendingUploadData] = useState<PendingStravaUpload | null>(null);
   const [workoutSummary, setWorkoutSummary] = useState<CompletedWorkoutSummary | null>(null);
@@ -375,7 +385,11 @@ export function WorkoutPlayer({ workout, onExit, onWorkoutComplete }: WorkoutPla
                   className="fixed inset-0 z-40"
                   onClick={() => setShowConnectivity(false)}
                 />
-                <div className="absolute right-0 top-full mt-2 w-72 bg-card rounded-xl shadow-lg border border-border z-50 p-4 space-y-3">
+                <div
+                  className="absolute right-0 top-full mt-2 w-72 bg-card rounded-xl shadow-lg border border-border z-50 p-4 space-y-3"
+                  onMouseEnter={() => { if (connectivityTimerRef.current) clearTimeout(connectivityTimerRef.current); }}
+                  onMouseLeave={() => { connectivityTimerRef.current = setTimeout(() => setShowConnectivity(false), 2000); }}
+                >
                   <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                     <Radio className="w-4 h-4" />
                     <span>Devices</span>
@@ -729,33 +743,62 @@ export function WorkoutPlayer({ workout, onExit, onWorkoutComplete }: WorkoutPla
                   </button>
                 </div>
 
-                {/* Right: Mode toggle */}
-                <div className="flex rounded-lg overflow-hidden border border-border">
-                  <button
-                    onClick={() => player.setControlMode('erg')}
-                    disabled={trainer.connectionState !== 'connected'}
-                    className={cn(
-                      "px-2 py-1 text-xs font-medium transition-colors flex items-center gap-1",
-                      player.playerState.controlMode === 'erg'
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent",
-                      trainer.connectionState !== 'connected' && "opacity-40 cursor-not-allowed"
-                    )}
-                  >
-                    <Zap className="w-3 h-3" />
-                    ERG
-                  </button>
-                  <button
-                    onClick={() => player.setControlMode('manual')}
-                    className={cn(
-                      "px-2 py-1 text-xs font-medium transition-colors",
-                      player.playerState.controlMode === 'manual'
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:text-foreground hover:bg-accent"
-                    )}
-                  >
-                    Manual
-                  </button>
+                {/* Right: Mode toggle + Intensity */}
+                <div className="flex items-center gap-2">
+                  {/* Intensity adjustment */}
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => player.adjustIntensity(-1)}
+                      disabled={player.playerState.status === 'stopped'}
+                      className="p-1.5 rounded-lg border border-border hover:bg-accent text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      title="Decrease intensity (-1%)"
+                    >
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className={cn(
+                      "text-xs font-medium tabular-nums min-w-[3.5rem] text-center",
+                      player.intensityOffset === 0 ? "text-muted-foreground" : player.intensityOffset > 0 ? "text-orange-500" : "text-blue-500"
+                    )}>
+                      {player.intensityOffset > 0 ? '+' : ''}{player.intensityOffset}%
+                    </span>
+                    <button
+                      onClick={() => player.adjustIntensity(1)}
+                      disabled={player.playerState.status === 'stopped'}
+                      className="p-1.5 rounded-lg border border-border hover:bg-accent text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      title="Increase intensity (+1%)"
+                    >
+                      <Plus className="w-3 h-3" />
+                    </button>
+                  </div>
+
+                  {/* Mode toggle */}
+                  <div className="flex rounded-lg overflow-hidden border border-border">
+                    <button
+                      onClick={() => player.setControlMode('erg')}
+                      disabled={trainer.connectionState !== 'connected'}
+                      className={cn(
+                        "px-2 py-1 text-xs font-medium transition-colors flex items-center gap-1",
+                        player.playerState.controlMode === 'erg'
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent",
+                        trainer.connectionState !== 'connected' && "opacity-40 cursor-not-allowed"
+                      )}
+                    >
+                      <Zap className="w-3 h-3" />
+                      ERG
+                    </button>
+                    <button
+                      onClick={() => player.setControlMode('manual')}
+                      className={cn(
+                        "px-2 py-1 text-xs font-medium transition-colors",
+                        player.playerState.controlMode === 'manual'
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                      )}
+                    >
+                      Manual
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

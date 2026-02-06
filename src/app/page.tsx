@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense, useCallback } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { WorkoutCreator } from "@/components/workout-creator";
 import { WorkoutView } from "@/components/workout-view";
@@ -11,8 +11,11 @@ import { RecentWorkouts } from "@/components/recent-workouts";
 import { SettingsModal } from "@/components/settings-modal";
 import { FTPSetup } from "@/components/ftp-setup";
 import { Workout, WorkoutCompletion, generateId } from "@/types/workout";
-import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useStrava, PendingStravaUpload } from "@/hooks/use-strava";
+import { useAuth } from "@/components/auth-provider";
+import { useWorkouts } from "@/hooks/use-workouts";
+import { useRawFTP } from "@/hooks/use-ftp";
+import { useDataMigration } from "@/hooks/use-data-migration";
 
 function HomeWithCallback() {
   const [currentWorkout, setCurrentWorkout] = useState<Workout | null>(null);
@@ -21,10 +24,12 @@ function HomeWithCallback() {
   const [showSettings, setShowSettings] = useState(false);
   const [showStravaModal, setShowStravaModal] = useState(false);
   const [pendingStravaUpload, setPendingStravaUpload] = useState<PendingStravaUpload | null>(null);
-  const [savedWorkouts, setSavedWorkouts] = useLocalStorage<Workout[]>("workouts", []);
-  const [ftp, setFtp] = useLocalStorage<number | null>("user-ftp", null);
+  const { workouts: savedWorkouts, saveWorkout, deleteWorkout } = useWorkouts();
+  const [ftp, setFtp] = useRawFTP();
   const [isHydrated, setIsHydrated] = useState(false);
   const strava = useStrava();
+  const { user, supabase } = useAuth();
+  const migration = useDataMigration();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -68,7 +73,7 @@ function HomeWithCallback() {
           // Save to recent workouts if not already there
           const existingIndex = savedWorkouts.findIndex(w => w.id === workout.id);
           if (existingIndex < 0) {
-            setSavedWorkouts([workout, ...savedWorkouts]);
+            saveWorkout(workout);
           }
         } catch (e) {
           console.error("Error parsing workout from pending upload:", e);
@@ -89,7 +94,7 @@ function HomeWithCallback() {
         console.error("Auto-upload failed:", err);
       });
     }
-  }, [strava.isConnected, strava.hasPendingUpload, strava.pendingUpload, strava.clearPendingUpload, strava.uploadActivity, savedWorkouts, setSavedWorkouts]);
+  }, [strava.isConnected, strava.hasPendingUpload, strava.pendingUpload, strava.clearPendingUpload, strava.uploadActivity, savedWorkouts, saveWorkout]);
 
   const handleFTPComplete = (newFtp: number) => {
     setFtp(newFtp);
@@ -110,14 +115,7 @@ function HomeWithCallback() {
   };
 
   const handleSaveWorkout = (workout: Workout) => {
-    const existingIndex = savedWorkouts.findIndex((w) => w.id === workout.id);
-    if (existingIndex >= 0) {
-      const updated = [...savedWorkouts];
-      updated[existingIndex] = workout;
-      setSavedWorkouts(updated);
-    } else {
-      setSavedWorkouts([workout, ...savedWorkouts]);
-    }
+    saveWorkout(workout);
   };
 
   const handleLoadWorkout = (workout: Workout) => {
@@ -131,7 +129,7 @@ function HomeWithCallback() {
   };
 
   const handleDeleteWorkout = (id: string) => {
-    setSavedWorkouts(savedWorkouts.filter((w) => w.id !== id));
+    deleteWorkout(id);
     if (currentWorkout?.id === id) {
       setCurrentWorkout(null);
     }
@@ -180,7 +178,7 @@ function HomeWithCallback() {
 
       // Add completed workout to the top of the list
       // The original workout plan (if it exists without completion) stays intact
-      setSavedWorkouts([completedWorkout, ...savedWorkouts]);
+      saveWorkout(completedWorkout);
     }
   };
 
@@ -240,14 +238,61 @@ function HomeWithCallback() {
             <span className="text-muted-foreground/40">Ride</span>
           </div>
 
-          <button
-            onClick={() => setShowSettings(true)}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Settings
-          </button>
+          <div className="flex items-center gap-3 sm:gap-4">
+            {user ? (
+              <>
+                <span className="hidden sm:inline text-xs text-muted-foreground truncate max-w-[160px]">
+                  {user.email}
+                </span>
+                <button
+                  onClick={async () => { await supabase.auth.signOut(); router.refresh(); }}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <a
+                href="/auth"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Sign In
+              </a>
+            )}
+            <button
+              onClick={() => setShowSettings(true)}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Settings
+            </button>
+          </div>
         </div>
       </header>
+
+      {migration.hasPendingMigration && (
+        <div className="bg-primary/5 border-b border-primary/10">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+            <p className="text-sm text-foreground">
+              Found <span className="font-semibold">{migration.localWorkoutCount}</span> workout{migration.localWorkoutCount !== 1 ? "s" : ""} saved locally. Import to your account?
+            </p>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={migration.migrateAll}
+                disabled={migration.isMigrating}
+                className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-40"
+              >
+                {migration.isMigrating ? "Importing..." : "Import All"}
+              </button>
+              <button
+                onClick={migration.skipMigration}
+                className="px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Skip
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         {currentWorkout ? (

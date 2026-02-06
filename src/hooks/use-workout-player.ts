@@ -26,6 +26,7 @@ interface UseWorkoutPlayerReturn {
   remainingTotalTime: number;
   recordedData: RecordedDataPoint[];
   isAutoPaused: boolean;
+  intensityOffset: number; // percentage offset, e.g. 5 means +5%
   play: () => void;
   pause: () => void;
   stop: () => void;
@@ -33,6 +34,7 @@ interface UseWorkoutPlayerReturn {
   skipForward: () => void;
   skipBackward: () => void;
   setControlMode: (mode: ControlMode) => void;
+  adjustIntensity: (delta: number) => void;
 }
 
 export function useWorkoutPlayer({
@@ -59,6 +61,7 @@ export function useWorkoutPlayer({
 
   const [recordedData, setRecordedData] = useState<RecordedDataPoint[]>([]);
   const [isAutoPaused, setIsAutoPaused] = useState(false);
+  const [intensityOffset, setIntensityOffset] = useState(0); // percentage points
 
   // Refs for timer management
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -126,15 +129,21 @@ export function useWorkoutPlayer({
     }
   }, [metrics, playerState.status, onAutoPause]);
 
+  const intensityOffsetRef = useRef(intensityOffset);
+  useEffect(() => {
+    intensityOffsetRef.current = intensityOffset;
+  }, [intensityOffset]);
+
   // Calculate target power for a segment at a given progress point
   const calculateTargetPower = useCallback(
     (segment: Segment, progress: number): number => {
       const startPower = segment.targetPower.value;
       const endPower = segment.targetPower.valueHigh ?? startPower;
 
-      // Linear interpolation for ramps
+      // Linear interpolation for ramps, then apply intensity offset
       const percentFTP = startPower + (endPower - startPower) * progress;
-      return Math.round((percentFTP / 100) * ftp);
+      const adjustedPercent = percentFTP + intensityOffsetRef.current;
+      return Math.max(0, Math.round((adjustedPercent / 100) * ftp));
     },
     [ftp]
   );
@@ -201,6 +210,7 @@ export function useWorkoutPlayer({
     expandedSegments,
     calculateTargetPower,
     setTargetPower,
+    intensityOffset,
   ]);
 
   // Main timer tick
@@ -529,6 +539,18 @@ export function useWorkoutPlayer({
     [setTargetPower, setResistanceMode]
   );
 
+  // Adjust intensity offset by a delta (e.g. +5 or -5 percentage points)
+  const adjustIntensity = useCallback(
+    (delta: number) => {
+      setIntensityOffset((prev) => {
+        const next = prev + delta;
+        // Clamp so the offset doesn't go below -(lowest segment %) — but a simple floor at -50 is safe
+        return Math.max(-50, Math.min(50, next));
+      });
+    },
+    []
+  );
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -562,6 +584,7 @@ export function useWorkoutPlayer({
     remainingTotalTime,
     recordedData,
     isAutoPaused,
+    intensityOffset,
     play,
     pause,
     stop,
@@ -569,5 +592,6 @@ export function useWorkoutPlayer({
     skipForward,
     skipBackward,
     setControlMode,
+    adjustIntensity,
   };
 }

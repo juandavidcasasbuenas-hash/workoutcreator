@@ -95,8 +95,18 @@ export function useHeartRateMonitor(): UseHeartRateMonitorReturn {
 
       setConnectionState("connected");
     } catch (err) {
+      // User cancelled the Bluetooth picker — not an error, just go back to disconnected
+      if (err instanceof DOMException && err.name === 'NotFoundError') {
+        setConnectionState('disconnected');
+        return;
+      }
       console.error("HR Monitor connection error:", err);
-      setErrorMessage(err instanceof Error ? err.message : "Failed to connect to HR monitor");
+      const msg = err instanceof DOMException && err.name === 'SecurityError'
+        ? 'Bluetooth permission denied'
+        : err instanceof DOMException && err.name === 'NetworkError'
+        ? 'Lost connection to HR monitor'
+        : 'Failed to connect to HR monitor';
+      setErrorMessage(msg);
       setConnectionState("error");
       cleanup();
     }

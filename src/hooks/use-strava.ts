@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "@/components/auth-provider";
 
 const STRAVA_STORAGE_KEY = "strava-auth";
 const STRAVA_PENDING_UPLOAD_KEY = "strava-pending-upload";
@@ -154,6 +155,7 @@ async function refreshTokenIfNeeded(tokens: StravaTokens): Promise<StravaTokens 
 }
 
 export function useStrava(): UseStravaReturn {
+  const { user, supabase } = useAuth();
   const [tokens, setTokens] = useState<StravaTokens | null>(null);
   const [uploadStatus, setUploadStatus] = useState<StravaUploadStatus>("idle");
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -161,14 +163,34 @@ export function useStrava(): UseStravaReturn {
   const [isHydrated, setIsHydrated] = useState(false);
   const [pendingUpload, setPendingUpload] = useState<PendingStravaUpload | null>(null);
 
-  // Hydrate from localStorage
+  // Hydrate from localStorage, then fall back to Supabase profile if logged in
   useEffect(() => {
     const stored = getStoredTokens();
     const pending = getPendingUpload();
-    setTokens(stored);
     setPendingUpload(pending);
-    setIsHydrated(true);
-  }, []);
+
+    if (stored) {
+      setTokens(stored);
+      setIsHydrated(true);
+    } else if (user) {
+      // No local tokens — try loading from Supabase profile
+      supabase
+        .from("profiles")
+        .select("strava_tokens")
+        .eq("id", user.id)
+        .single()
+        .then(({ data }) => {
+          if (data?.strava_tokens) {
+            const profileTokens = data.strava_tokens as StravaTokens;
+            storeTokens(profileTokens); // cache locally
+            setTokens(profileTokens);
+          }
+          setIsHydrated(true);
+        });
+    } else {
+      setIsHydrated(true);
+    }
+  }, [user, supabase]);
 
   const isConfigured = Boolean(STRAVA_CLIENT_ID);
   const isConnected = isHydrated && tokens !== null;
@@ -214,7 +236,17 @@ export function useStrava(): UseStravaReturn {
     setUploadStatus("idle");
     setUploadError(null);
     setActivityUrl(null);
-  }, []);
+    // Clear from Supabase profile if logged in
+    if (user) {
+      supabase
+        .from("profiles")
+        .update({ strava_tokens: null })
+        .eq("id", user.id)
+        .then(({ error }) => {
+          if (error) console.error("Error clearing Strava tokens from profile:", error);
+        });
+    }
+  }, [user, supabase]);
 
   const handleAuthCallback = useCallback((authData: string) => {
     try {
@@ -227,10 +259,20 @@ export function useStrava(): UseStravaReturn {
       };
       storeTokens(newTokens);
       setTokens(newTokens);
+      // Persist to Supabase profile if logged in
+      if (user) {
+        supabase
+          .from("profiles")
+          .update({ strava_tokens: newTokens })
+          .eq("id", user.id)
+          .then(({ error }) => {
+            if (error) console.error("Error saving Strava tokens to profile:", error);
+          });
+      }
     } catch (e) {
       console.error("Error parsing Strava auth data:", e);
     }
-  }, []);
+  }, [user, supabase]);
 
   const uploadActivity = useCallback(
     async (tcxData: string, name: string, description?: string): Promise<StravaUploadResult> => {
@@ -257,6 +299,16 @@ export function useStrava(): UseStravaReturn {
 
         if (validTokens !== tokens) {
           setTokens(validTokens);
+          // Write refreshed tokens to Supabase
+          if (user) {
+            supabase
+              .from("profiles")
+              .update({ strava_tokens: validTokens })
+              .eq("id", user.id)
+              .then(({ error }) => {
+                if (error) console.error("Error syncing refreshed Strava tokens:", error);
+              });
+          }
         }
 
         // Upload the activity
@@ -337,13 +389,16 @@ export function useStrava(): UseStravaReturn {
         setUploadStatus("success");
         return uploadData;
       } catch (e) {
-        const errorMessage = e instanceof Error ? e.message : "Unknown error";
+        console.error("Strava upload error:", e);
+        const msg = e instanceof TypeError
+          ? "Network error — check your internet connection"
+          : "Failed to upload to Strava";
         setUploadStatus("error");
-        setUploadError(errorMessage);
+        setUploadError(msg);
         throw e;
       }
     },
-    [tokens]
+    [tokens, user, supabase]
   );
 
   return {
